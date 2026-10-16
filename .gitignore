@@ -1,0 +1,39 @@
+# Local credentials
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Node
+node_modules/
+dist/
+
+# Local databases and generated output
+*.db
+*.sqlite
+*.sqlite3
+**/benchmark_reports/
+evaluation/reports/
+backenddata/
+*.log
+*.txt
+!requirements.txt
+!CMakeLists.txt
+!.env.example
+backend/*_out.txt
+backend/import_error.txt
+/.devin/
+/.run-logs/
+/nul
+
+# Editors and operating systems
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

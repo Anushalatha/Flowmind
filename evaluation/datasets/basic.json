@@ -1,0 +1,19 @@
+[
+  {
+    "id": "eval_1",
+    "request": "Calculate 15% of 2000, add 250, then divide by 5.",
+    "expected_steps_count": 3,
+    "expected_status": "completed"
+  },
+  {
+    "id": "eval_2_fail",
+    "request": "Calculate 20% of 500, divide by 0, then add 100.",
+    "expected_status": "failed",
+    "must_fail_on_step": "divide"
+  },
+  {
+    "id": "eval_3_parallel",
+    "request": "Research FastAPI, Flask, and Django for backend development, compare them, and produce a structured report.",
+    "expected_status": "completed"
+  }
+]

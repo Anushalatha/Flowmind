@@ -1,0 +1,29 @@
+volumes:
+  flowmind_db:
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./backend:/app
+      - flowmind_db:/app/data
+    env_file:
+      - path: "${BACKEND_ENV_FILE:-./backend/.env}"
+        required: false
+    environment:
+      - DB_URL=sqlite:////app/data/flowmind.db
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "${FRONTEND_PORT:-3000}:80"
+    depends_on:
+      backend:
+        condition: service_healthy

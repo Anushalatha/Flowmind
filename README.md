@@ -72,11 +72,9 @@ The architecture separates planning, execution, persistence, and visualization s
 
 These screenshots use synthetic workflow and controlled-benchmark data.
 
+![Dashboard](docs/images/dashboard.png)
 ![Workflow execution graph](docs/images/workflow-graph.png)
-
-![Monitoring dashboard](docs/images/monitoring-dashboard.png)
-
-![Controlled benchmark results](docs/images/benchmark-results.png)
+![Monitoring ](docs/images/monitoring-dashboard.png)
 
 ## Technology Stack
 

@@ -3,8 +3,7 @@ import Dashboard from './pages/Dashboard';
 import NewWorkflow from './pages/NewWorkflow';
 import LiveWorkflow from './pages/LiveWorkflow';
 import Monitoring from './pages/Monitoring';
-import BenchmarkResults from './pages/BenchmarkResults';
-import { LayoutDashboard, Play, Activity, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Play, Activity } from 'lucide-react';
 import { ReactFlowProvider } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -27,10 +26,6 @@ function Sidebar() {
           <Activity size={20} className="text-gray-400" />
           <span>Monitoring</span>
         </Link>
-        <Link to="/benchmarks" className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-800 transition-colors">
-          <BarChart3 size={20} className="text-gray-400" />
-          <span>Benchmarks</span>
-        </Link>
       </nav>
     </div>
   );
@@ -48,7 +43,6 @@ function App() {
               <Route path="/new" element={<NewWorkflow />} />
               <Route path="/workflow/:id" element={<LiveWorkflow />} />
               <Route path="/monitoring" element={<Monitoring />} />
-              <Route path="/benchmarks" element={<BenchmarkResults />} />
             </Routes>
           </main>
         </div>

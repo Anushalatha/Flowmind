@@ -1,8 +1,8 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks, Request
+from fastapi import APIRouter, HTTPException, Query, Request
 from sse_starlette.sse import EventSourceResponse
 import asyncio
 from pydantic import BaseModel
-from typing import Dict, Any, List
+from typing import Optional
 from app.orchestrator.engine import engine
 from app.persistence.database import SessionLocal, WorkflowRecord, EventRecord
 from sqlalchemy import func
@@ -12,6 +12,9 @@ router = APIRouter()
 
 class WorkflowRequest(BaseModel):
     request: str
+
+class RerunWorkflowRequest(BaseModel):
+    request: Optional[str] = None
 
 class WorkflowResponse(BaseModel):
     workflow_id: str
@@ -23,10 +26,47 @@ async def create_workflow(req: WorkflowRequest):
     return WorkflowResponse(workflow_id=workflow_id, status="started")
 
 @router.get("/workflows")
-def list_workflows():
+def list_workflows(
+    status: Optional[str] = None,
+    limit: int = Query(default=50, ge=1, le=200),
+):
     with SessionLocal() as db:
-        records = db.query(WorkflowRecord).order_by(WorkflowRecord.created_at.desc()).limit(50).all()
+        query = db.query(WorkflowRecord)
+        if status:
+            query = query.filter(WorkflowRecord.status == status)
+        records = query.order_by(WorkflowRecord.created_at.desc()).limit(limit).all()
         return [{"workflow_id": r.id, "status": r.status, "user_request": r.user_request} for r in records]
+
+@router.post("/workflows/{workflow_id}/rerun", response_model=WorkflowResponse)
+async def rerun_workflow(
+    workflow_id: str,
+    req: Optional[RerunWorkflowRequest] = None,
+):
+    with SessionLocal() as db:
+        record = db.query(WorkflowRecord).filter(WorkflowRecord.id == workflow_id).first()
+        if not record:
+            raise HTTPException(status_code=404, detail="Workflow not found")
+        user_request = req.request if req and req.request is not None else record.user_request
+
+    if not user_request.strip():
+        raise HTTPException(status_code=422, detail="Workflow request cannot be empty")
+
+    new_workflow_id = engine.new_workflow(user_request)
+    return WorkflowResponse(workflow_id=new_workflow_id, status="started")
+
+@router.delete("/workflows/{workflow_id}")
+def delete_workflow(workflow_id: str):
+    with SessionLocal() as db:
+        record = db.query(WorkflowRecord).filter(WorkflowRecord.id == workflow_id).first()
+        if not record:
+            raise HTTPException(status_code=404, detail="Workflow not found")
+        if record.status in {"pending", "planning", "running", "waiting", "retrying"}:
+            raise HTTPException(status_code=409, detail="Cannot delete an active workflow")
+
+        db.query(EventRecord).filter(EventRecord.workflow_id == workflow_id).delete(synchronize_session=False)
+        db.delete(record)
+        db.commit()
+        return {"workflow_id": workflow_id, "status": "deleted"}
 
 @router.get("/workflows/{workflow_id}")
 def get_workflow(workflow_id: str):

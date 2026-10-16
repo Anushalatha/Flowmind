@@ -1,98 +1,123 @@
 # FlowMind — AI Workflow Orchestration Platform
 
-FlowMind is an AI workflow orchestration platform that transforms natural-language requests into structured, executable workflows. It combines LLM-powered planning, tool execution, dependency-aware scheduling, failure handling, and real-time monitoring to make AI workflows more observable and manageable.
+FlowMind is an AI workflow orchestration platform that transforms natural-language requests into structured, executable workflows. It combines LLM-driven planning, dependency-aware scheduling, tool execution, fault handling, persistent state management, and real-time observability to coordinate multi-step AI tasks.
 
-The platform explores the engineering foundations required to build reliable AI systems beyond simple prompt-response interactions.
+Rather than treating an LLM as a standalone response generator, FlowMind explores the systems engineering required to plan, execute, monitor, and recover AI-driven workflows.
 
-## Key Features
+## Core Capabilities
 
-### 1. LLM-Powered Workflow Planning
-- Converts natural-language requests into structured execution plans.
-- Selects appropriate tools for individual tasks.
-- Supports multi-step workflows with explicit dependencies.
-- Passes intermediate results between dependent steps.
+### 1. LLM-Driven Planning and Execution
 
-### 2. Dependency-Aware Orchestration
-- Executes sequential and independent tasks.
-- Supports parallel execution where dependencies permit.
-- Resolves scalar and structured tool outputs.
-- Tracks step-level execution states and dependencies.
+- Converts natural-language objectives into structured workflow plans.
+- Selects tools based on task requirements.
+- Decomposes requests into executable steps with dependencies.
+- Supports intermediate-result passing and final response synthesis.
+- Separates planning, execution, and synthesis responsibilities.
 
-### 3. Reliability and Failure Handling
-- Implements retry mechanisms for transient failures.
-- Classifies execution errors.
-- Handles empty results and blocked dependencies.
-- Supports partial workflow completion.
-- Persists workflow states to maintain consistent execution records.
+### 2. Dependency-Aware Workflow Orchestration
 
-### 4. Real-Time Execution Monitoring
-- Streams workflow events using Server-Sent Events (SSE).
-- Tracks planner activity, tool execution, step completion, and failures.
-- Provides visibility into workflow progress and final results.
+- Executes sequential tasks while respecting dependency constraints.
+- Supports parallel execution of independent steps.
+- Resolves scalar and structured tool outputs across workflow steps.
+- Tracks step-level execution states and dependency relationships.
+- Detects blocked dependencies and unresolved execution paths.
+
+### 3. Fault Tolerance and Recovery
+
+- Implements retry handling for transient failures.
+- Classifies execution errors to distinguish different failure conditions.
+- Differentiates empty research results from actual tool failures.
+- Handles blocked steps and partially completed workflows.
+- Preserves workflow status consistency across execution and persistence layers.
+
+### 4. Event-Driven Observability
+
+- Streams workflow lifecycle events through Server-Sent Events (SSE).
+- Tracks planning, step execution, tool calls, completion, and failures.
+- Maintains persistent workflow execution records.
+- Provides real-time visibility into workflow progress and execution outcomes.
 
 ### 5. Interactive Workflow Visualization
-- Uses React Flow to visualize workflow steps and dependencies.
-- Displays step-level execution states.
-- Helps identify failed, completed, and blocked operations.
 
-### 6. Benchmarking and Evaluation
-- Includes a benchmark framework for evaluating workflow execution.
-- Supports controlled execution with deterministic fixtures and live-provider testing.
-- Measures workflow completion, expected-behavior pass rate, output correctness, latency, and failure recovery.
-- Generates JSON and Markdown benchmark reports.
+- Uses React Flow to represent workflow steps and dependency relationships.
+- Displays execution states as workflows progress.
+- Makes task dependencies, execution paths, and failure points easier to inspect.
+- Connects workflow execution events to the frontend visualization.
 
-## Architecture
+### 6. Configurable LLM Integration
+
+- Integrates with supported LLM providers such as Groq and Google Gemini.
+- Separates provider configuration from workflow orchestration.
+- Supports structured workflow plans and tool-oriented execution.
+
+### 7. Automated Testing and Evaluation
+
+- Uses pytest to validate orchestration behavior and regression scenarios.
+- Includes controlled workflow benchmarking with predefined plans and external-service fixtures.
+- Evaluates execution correctness, dependency handling, failure behavior, and workflow state transitions.
+- Generates JSON and Markdown reports for benchmark analysis.
+
+## System Architecture
 
 ```mermaid
 flowchart TD
-    A[User Request] --> B[LLM Planner]
-    B --> C[Structured Workflow Plan]
-    C --> D[Orchestration Engine]
-    D --> E[Dependency Resolver]
-    E --> F[Tool Execution]
-    F --> G[Result Validation]
-    G --> H{More Steps?}
-    H -->|Yes| E
-    H -->|No| I[Final Synthesis]
-    I --> J[Workflow Result]
+    A["Natural-Language Request"] --> B["LLM Planner"]
+    B --> C["Structured Workflow Plan"]
+    C --> D["Orchestration Engine"]
 
-    D --> K[Execution Event Stream]
-    K --> L[FastAPI SSE Endpoint]
-    L --> M[React Frontend]
-    M --> N[React Flow Visualization]
-    M --> O[Monitoring Dashboard]
+    D --> E["Dependency Resolution"]
+    E --> F["Tool Registry"]
+    F --> G["Tool Execution"]
+    G --> H["Result and Error Handling"]
 
-    D --> P[(SQLite Persistence)]
-    P --> O
+    H --> I{"More Steps?"}
+    I -->|Yes| E
+    I -->|No| J["Final Synthesis"]
+
+    J --> K["Workflow Result"]
+
+    D --> L["Workflow Event Stream"]
+    L --> M["FastAPI SSE Endpoint"]
+    M --> N["React Frontend"]
+
+    N --> O["React Flow Graph"]
+    N --> P["Monitoring Dashboard"]
+
+    D --> Q[("SQLite Persistence")]
+    Q --> P
 ```
 
-The architecture separates planning, execution, persistence, and visualization so that workflow behavior can be monitored and evaluated independently.
+The orchestration engine coordinates execution and dependencies. Tool results and failures feed back into workflow state management, while SSE events expose execution progress to the frontend. Persistent records support status tracking and monitoring.
+
+## Technical Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, TypeScript |
+| Workflow visualization | React Flow |
+| Backend and APIs | Python, FastAPI |
+| LLM integration | Groq, Google Gemini |
+| Communication | REST APIs, Server-Sent Events |
+| Persistence | SQLite, SQLAlchemy |
+| Testing | pytest |
+| Benchmarking | Python, controlled fixtures, JSON, Markdown |
+| Containerization | Docker, Docker Compose |
 
 ## Screenshots
 
 These screenshots use synthetic workflow and controlled-benchmark data.
 
 ![Dashboard](docs/images/dashboard.png)
+
 ![Workflow execution graph](docs/images/workflow-graph.png)
+
 ![Monitoring ](docs/images/monitoring-dashboard.png)
 
-## Technology Stack
-
-| Layer | Technologies |
-|---|---|
-| Frontend | React, TypeScript |
-| Workflow visualization | React Flow |
-| Backend | Python, FastAPI |
-| AI integration | Groq, Google Gemini |
-| Communication | REST APIs, Server-Sent Events |
-| Persistence | SQLite, SQLAlchemy |
-| Benchmarking | Python, pytest, JSON and Markdown reports |
-| Containerization | Docker, Docker Compose |
 
 ## Project Structure
 
 ```text
-FlowMind/
+Flowmind/
 ├── backend/
 │   ├── app/
 │   │   ├── agents/
@@ -113,48 +138,50 @@ FlowMind/
 └── README.md
 ```
 
-*Directory names may vary slightly depending on the current repository structure.*
+Directory names may vary slightly. Keep this tree aligned with the actual repository.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.12 or newer
-- Node.js 20.19+ or 22.12+ and npm
-- Docker and Docker Compose (for containerized execution)
-- A Groq or Gemini API key to run LLM-backed workflows (the app can start without one)
+- Python 3.12 or a compatible version specified by the project
+- Node.js and npm
+- Docker and Docker Compose
+- An API key for the configured LLM provider when running live LLM workflows
 
 ### 1. Clone the repository
 
 ```bash
-git clone <YOUR_GITHUB_REPOSITORY_URL>
-cd FlowMind
+git clone https://github.com/Anushalatha/Flowmind.git
+cd Flowmind
 ```
 
 ### 2. Configure environment variables
 
-To enable LLM-backed workflows, copy the backend environment example and add a key for the selected provider. The app and Docker Compose can also start without an API key, but workflow requests that need an LLM will fail until one is configured.
+Copy the backend environment template.
+
+**Windows PowerShell**
 
 ```powershell
 Copy-Item backend\.env.example backend\.env
 ```
 
-On macOS/Linux:
+**macOS/Linux**
 
 ```bash
 cp backend/.env.example backend/.env
 ```
 
-Set `LLM_PROVIDER` to `groq` or `gemini`, then configure the matching `GROQ_API_KEY` or `GEMINI_API_KEY`. For example:
+Configure the provider and required credentials in `backend/.env`. For example:
 
-```dotenv
+```env
 LLM_PROVIDER=groq
 GROQ_API_KEY=your-groq-api-key
 ```
 
-Model names, `MAX_AGENT_STEPS`, and `DB_URL` can also be set in the environment. See [`backend/.env.example`](backend/.env.example) for the available settings. Keep API keys and credentials in your local `.env` file; never commit it.
+Refer to `backend/.env.example` for the exact supported variable names and model configuration. Never commit real API keys or secrets.
 
-### 3. Start the application
+### 3. Start with Docker Compose
 
 From the project root:
 
@@ -162,18 +189,23 @@ From the project root:
 docker compose up --build
 ```
 
-The API is available at <http://localhost:8000> and <http://localhost:8000/health>; the frontend is at <http://localhost:3000>. Compose waits for the backend health check before starting the frontend. The database is stored in a persistent Docker volume.
+Open the frontend and backend using the ports configured in `docker-compose.yml`. Check the Compose configuration if your local port mappings differ.
 
-To run the backend locally, then start the frontend in a second terminal:
+### 4. Run locally for development
+
+Start the backend in one terminal.
+
+**Windows PowerShell**
 
 ```powershell
 cd backend
 python -m venv .venv
-.venv\Scripts\python.exe -m pip install -r requirements.txt
-.venv\Scripts\python.exe -m uvicorn app.main:app --reload --port 8000
+.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+python -m uvicorn app.main:app --reload --port 8000
 ```
 
-On macOS/Linux:
+**macOS/Linux**
 
 ```bash
 cd backend
@@ -183,87 +215,77 @@ python -m pip install -r requirements.txt
 python -m uvicorn app.main:app --reload --port 8000
 ```
 
+Start the frontend in another terminal:
+
 ```bash
 cd frontend
 npm ci
 npm run dev
 ```
 
-Open <http://localhost:5173>. The Vite development server proxies `/api` requests to the local backend.
+Use the development URL printed by Vite. The backend API documentation is typically available at `http://localhost:8000/docs` if the backend is configured to use port 8000.
 
-## Benchmarking
+## Testing and Verification
 
-FlowMind includes a benchmark framework for evaluating orchestration behavior under controlled and live execution conditions.
+FlowMind uses `pytest` to validate workflow orchestration, dependency resolution, failure handling, persistence, and supporting backend components.
 
-### Controlled benchmark
+Run the complete backend test suite:
 
-Uses predefined workflow plans and mocked external responses to evaluate execution behavior without depending on live provider availability.
+```bash
+cd backend
+python -m pytest -q
+```
+
+**Recorded test result:** 76 backend tests passed in a previous run.
+
+This result reflects that specific test run; execute the test suite against the latest code revision to verify the current status.
+
+## Controlled Workflow Benchmarking
+
+FlowMind includes a backend benchmark runner for evaluating representative orchestration scenarios independently of the frontend.
+
+Run the controlled benchmark:
 
 ```bash
 cd backend
 python -m app.benchmarks.run --mode controlled
 ```
 
-A local controlled sequential run completed **5/5 cases** with **0 failures**
-and a **0.53 s median latency**. This is one deterministic sample run, not a
-general performance guarantee; results vary by benchmark category and code
-version. The screenshots above use synthetic controlled-benchmark data.
-
-### Live-provider benchmark
-
-Exercises integrations using the configured provider and external services:
+Run the live-provider benchmark:
 
 ```bash
 python -m app.benchmarks.run --mode live
 ```
 
-### Run benchmark tests
+Controlled mode uses predefined workflow plans and controlled external-service responses. Live mode exercises configured providers and integrations and may be affected by network conditions, provider availability, rate limits, and response latency.
 
-```bash
-python -m pytest tests/test_benchmarks.py -v
-```
+The benchmark framework supports evaluation of:
 
-Run the complete backend test suite:
-
-```bash
-python -m pytest -q
-```
-
-Benchmark reports are generated in the backend benchmark reports directory. Refer to the generated reports for measured results, execution mode, failures, and latency statistics.
-
-## Reliability and Evaluation
-
-FlowMind distinguishes between workflow execution outcomes and benchmark correctness. A completed workflow does not necessarily imply that its final answer is correct.
-
-The evaluation framework supports metrics such as:
-
-- Workflow completion rate
-- Expected-behavior pass rate
+- Workflow completion and expected execution behavior
 - Output correctness
-- Median and p95 workflow latency
-- Tool execution success rate
-- Retry recovery rate
-- Provider/API error rate
-- Partial-completion rate
+- Dependency handling and parallel execution
+- Failure classification and retry recovery
+- Workflow latency
+- Partial completion and persistence
 
-Results should be interpreted alongside the benchmark configuration, execution mode, test coverage, and external service dependencies.
+Refer to generated reports for the results of each run. Controlled benchmark outcomes should not be interpreted as a guarantee of live-provider reliability.
 
-## Design Principles
+## Engineering Principles
 
-- **Modular orchestration:** Separate planning, execution, and synthesis responsibilities.
-- **Observable execution:** Expose workflow progress and step-level state transitions.
-- **Failure-aware execution:** Distinguish empty results, transient failures, and blocked dependencies.
-- **Reproducible evaluation:** Use controlled fixtures to test execution behavior consistently.
-- **Provider flexibility:** Keep LLM integration configurable.
-- **Evidence-aware output:** Avoid treating missing research evidence as verified information.
+- **Separation of concerns:** Keep planning, orchestration, tool execution, and synthesis modular.
+- **Dependency correctness:** Execute tasks according to their actual dependency relationships.
+- **Failure-aware orchestration:** Distinguish empty results, transient errors, and blocked tasks.
+- **State consistency:** Preserve reliable workflow status across execution and persistence.
+- **Event-driven visibility:** Make workflow progress observable through streamed events.
+- **Reproducible validation:** Use controlled fixtures and explicit execution assertions.
 
-## Future Improvements
+## Future Development
 
-- Improve benchmark coverage and resolve remaining failing scenarios.
-- Expand research evaluation and source-quality validation.
-- Enhance workflow graph layout and execution-state visualization.
-- Improve latency analysis and historical benchmark comparisons.
-- Strengthen deployment, monitoring, and operational diagnostics.
+- Expand failure-recovery and orchestration regression coverage.
+- Improve research retrieval and evidence validation.
+- Enhance execution graph layout and observability.
+- Improve latency analysis and historical workflow diagnostics.
+- Strengthen deployment and operational reliability.
 
 ## Author
 
@@ -271,10 +293,9 @@ Results should be interpreted alongside the benchmark configuration, execution m
 
 AI Engineering | Generative AI | Workflow Orchestration | AI Infrastructure
 
-GitHub: [Anushalatha](https://github.com/Anushalatha)
-
-LinkedIn: [(https://www.linkedin.com/in/anusha-b-ai)]
+- GitHub: [Anushalatha](https://github.com/Anushalatha)
+- LinkedIn: [Anusha B.](https://www.linkedin.com/in/anusha-b-ai)
 
 ---
 
-*FlowMind is a project exploring the design and evaluation of observable, dependency-aware AI workflow orchestration systems.*
+*FlowMind explores the design of observable, dependency-aware AI workflow orchestration systems.*
